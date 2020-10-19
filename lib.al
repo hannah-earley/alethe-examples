@@ -171,7 +171,7 @@ n `QuoRem d` q r:
 0  `Dig=Char` '0; 1  `Dig=Char` '1; 2  `Dig=Char` '2; 3  `Dig=Char` '3;
 4  `Dig=Char` '4; 5  `Dig=Char` '5; 6  `Dig=Char` '6; 7  `Dig=Char` '7;
 8  `Dig=Char` '8; 9  `Dig=Char` '9; 10 `Dig=Char` 'a; 11 `Dig=Char` 'b;
-12 `Dig=Char` 'c; 13 `Dig=Char` 'd; 14 `Dig=Char` 'f; 15 `Dig=Char` 'g;
+12 `Dig=Char` 'c; 13 `Dig=Char` 'd; 14 `Dig=Char` 'e; 15 `Dig=Char` 'f;
 
 Z     `Digits b` [0];
 (S n) `Digits b` [(S d) . ds]:
