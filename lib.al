@@ -319,7 +319,7 @@ xs `Span p` ys zs:
       ~Go p True ys [x . xs] = ~Go p [x . ys] xs;
 
 
---# sorting
+--# sorting (mergesort)
 
 `Merge p [] []` [];
 `Merge p [x . xs] []` [x' . xs']:
@@ -369,6 +369,23 @@ xs ys `MergeIrrev p` ds zs':
       `p x y` b.
     ~Go p ds True  [x . xs] [y . ys] zs = ~Go p [L . ds] xs [y . ys] [x . zs];
     ~Go p ds False [x . xs] [y . ys] zs = ~Go p [R . ds] [x . xs] ys [y . zs];
+
+
+--# sorting (insertion sort)
+
+xs `InsertSort p` ns ys:
+    ! ~Go p xs [] [] = ~Go p [] ns ys.
+    ~Go p [x . xs] ns ys = ~Go p xs [n . ns] ys':
+        x ys `Insert p` n ys'.
+
+x [] `Insert p` 0 [x];
+x [y . ys] `Insert p` n [z z' . zs]:
+    `p x y` b.
+    x [y . ys] b `~Insert p` n [z z' . zs].
+
+    x [y . ys] False `~Insert p` (S n) [y . zs]:
+        x ys `Insert p` n zs.
+    x [y . ys] True `~Insert p` Z [x y . ys];
 
 
 --# strings
