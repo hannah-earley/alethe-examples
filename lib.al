@@ -92,7 +92,9 @@ a b `CSwap True`  b a;
     ! ~L a     Z Z = ~L Z a     b.
       ~L (S a) b c = ~L a (S b) (S c);
 
-n `Succ` (S n);
+-- ensure we only match nats here so we can match other types later
+Z `Succ` (S Z);
+(S n) `Succ` (S (S n));
 
 data EQ;
 data GT;
@@ -144,8 +146,8 @@ a b >=? p d m:
 `(<= a) b` p: `<= a b` p.
 `(>= a) b` p: `>= a b` p.
 
-
-a `+ b` c:
+a `+ Z` a;
+a `+ (S b)` (S c):
     ! ~Go a Z b      = ~Go c     b     Z.
       ~Go a b (S b') = ~Go (S a) (S b) b';
 
@@ -207,7 +209,7 @@ n ^2 n2:
       ~Go (S n) m = ~Go n (S k):
           m `+ n` l.
           l `+ n` k.
-n ^2' n n2:
+`^2 n` n2:
     ! ~Go n     Z  Z = ~Go Z n      n2.
       ~Go (S n) n' m = ~Go n (S n') (S k):
           m `+ n` l.
@@ -251,7 +253,107 @@ n `Fib` a b:
       ~Go a (S (S b)) (S n) = ~Go (S (S b)) c n:
           a `+ (S (S b))` c.
 
+`GCD Z Z` Z;
+`GCD Z (S b)` (S b'): `Dup b` b'.
+`GCD (S a) Z` (S a'): `Dup a` a'.
+`GCD (S a) (S b)` g:
+    (S a) (S b) `Diff` ord diff min.
+    `~Go ord diff min` g.
 
+    `~Go EQ Z   a` a': `Dup a` a'.
+    `~Go LT b-a a` g:  `GCD a b-a` g.
+    `~Go GT a-b b` g:  `GCD a-b b` g.
+
+--# integers
+
+data IntN a;
+data IntZ;
+data IntP a;
+
+-- negation
+ IntZ    -  IntZ;
+(IntP a) - (IntN a);
+(IntN a) - (IntP a);
+
+(IntN (S a)) `Succ` (IntN a);
+(IntN Z)     `Succ`  IntZ;
+ IntZ        `Succ` (IntP Z);
+(IntP a)     `Succ` (IntP (S a));
+
+a `+ IntZ` a;
+a `+ (IntP b)` c:
+  ! ~Go (S b) a Z  = ~Go Z c  (S b).
+    ~Go (S b) c b' = ~Go b c' (S b'):
+      c `Succ` c'.
+a `+ (IntN b)` c:
+  ! ~Go (S b) a Z  = ~Go Z c  (S b).
+    ~Go (S b) c b' = ~Go b c' (S b'):
+      c' `Succ` c.
+
+IntZ `* (IntP b)` IntZ;
+(IntP a) `* (IntP b)` (IntP c):
+   (S a) `* (S b)` (S c).
+(IntN a) `* (IntP b)` (IntN c):
+   (S a) `* (S b)` (S c).
+a `* (IntN b)` c:
+   a `* (IntP b)` c'.
+   c - c'.
+
+--# rationals
+
+-- Frac p q == p / (q + 1)
+-- num is int, den is nat
+data Frac num den;
+
+(Frac p q) - (Frac p' q):
+    p - p'.
+
+(Frac (IntN a) b) 1/ (Frac (IntN b) a);
+(Frac (IntP a) b) 1/ (Frac (IntP b) a);
+
+-- simplify pulls out a common factor (gcd) from num and den
+(Frac (IntN p) q) `Simplify` (Frac (IntN r) s) g:
+    (Frac (IntP p) q) `Simplify` (Frac (IntP r) s) g.
+(Frac IntZ q) `Simplify` (Frac IntZ Z) (S q);
+(Frac (IntP p) q) `Simplify` (Frac (IntP r) s) g:
+    `GCD (S p) (S q)` g.
+    (S r) `* g` (S p).
+    (S s) `* g` (S q).
+
+-- add simplified fractions
+--- first, compute  a/b + p/q =  gc/gd  where c/d is simplified
+--- then, note that c/d - p/q = g'a/g'b where gg' == q^2
+--- this information is then sufficient to erase the garbage...
+a/b `+ (Frac p q)` c/d:
+    p - p'.
+    a/b `~ (Frac p  q)` c/d g.
+    c/d `~ (Frac p' q)` a/b g'.
+    `^2 (S q)` q2.
+    g' `* g` q2.
+
+    (Frac a b) `~ (Frac p q)` c/d g:
+        a `* (IntP q)` aq.
+        (IntP b) `* p` pb.
+        aq `+ pb` c'.
+        (S b) `* (S q)` (S d').
+        (Frac c' d') `Simplify` c/d g.
+
+-- multiply simplified fractions
+--- similar to addition, except observe gg' == pq
+a/b `* (Frac p q)` c/d:
+    (Frac p q) 1/ q/p.
+    a/b `~1 (Frac p q)` c/d g.
+    c/d `~1 q/p` a/b g'.
+    `~2 p q` pq.
+    g' `* g` pq.
+
+    (Frac a b) `~1 (Frac p q)` c/d g:
+        a `* p` ap.
+        (S b) `* (S q)` (S bq).
+        (Frac ap bq) `Simplify` c/d g.
+
+    `~2 (IntN p) q` pq: `Dup p` p'. (S p') `* (S q)` pq.
+    `~2 (IntP p) q` pq: `Dup p` p'. (S p') `* (S q)` pq.
 
 --# binary
 
