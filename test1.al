@@ -1,6 +1,6 @@
-import "test1.al"
-import "test2.al"
--- import "../test2.al"
+import "test1.al";
+import "test2.al";
+-- import "../test2.al";
 
 data F; data T;
 

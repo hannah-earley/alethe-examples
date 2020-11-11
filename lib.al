@@ -373,14 +373,25 @@ xs ys `MergeIrrev p` ds zs':
 
 --# sorting (insertion sort)
 
-xs `InsertSort p` ns ys:
+xs `InsertionSort p` ns' ys:
     ! ~Go p xs [] [] = ~Go p [] ns ys.
-    ~Go p [x . xs] ns ys = ~Go p xs [n . ns] ys':
+    ~Go p [x . xs] ns ys = ~Go p xs [n . ns'] ys':
         x ys `Insert p` n ys'.
 
-[] `InsertSortRec p` [] [];
-[x . xs] `InsertSortRec p` [n . ns] zs:
-    xs `InsertSortRec p` ns ys.
+        -- process ns to be the permutation mapping xs to ys,
+        -- i.e. the indices of each x in y
+        ns `Map (~Go n)` ns'.
+        m `~Go n` m':
+            `< m n` b.
+            `< m' n` b.
+            m `~~Go' b` m'.
+        m `~Go' True` m;
+        m `~Go' False` (S m);
+    ns `Rev` ns'.
+
+[] `InsertionSortRec p` [] [];
+[x . xs] `InsertionSortRec p` [n . ns] zs:
+    xs `InsertionSortRec p` ns ys.
     x ys `Insert p` n zs.
 
 x [] `Insert p` 0 [x];

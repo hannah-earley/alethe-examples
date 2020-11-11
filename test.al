@@ -1,4 +1,4 @@
-import "lib.al"
+import "lib.al";
 
 
 ! Foo _;
