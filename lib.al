@@ -330,6 +330,7 @@ a/b `+ (Frac p q)` c/d:
     c/d `~ (Frac p' q)` a/b g'.
     `^2 (S q)` q2.
     g' `* g` q2.
+    g `* g'` q2.
 
     (Frac a b) `~ (Frac p q)` c/d g:
         a `* (IntP q)` aq.
@@ -346,6 +347,7 @@ a/b `* (Frac p q)` c/d:
     c/d `~1 q/p` a/b g'.
     `~2 p q` pq.
     g' `* g` pq.
+    g `* g'` pq.
 
     (Frac a b) `~1 (Frac p q)` c/d g:
         a `* p` ap.
@@ -486,9 +488,9 @@ xs `InsertionSort p` ns' ys:
         m `~Go n` m':
             `< m n` b.
             `< m' n` b.
-            m `~~Go' b` m'.
-        m `~Go' True` m;
-        m `~Go' False` (S m);
+            m `~~ b` m'.
+        m `~ True` m;
+        m `~ False` (S m);
     ns `Rev` ns'.
 
 [] `InsertionSortRec p` [] [];
@@ -748,13 +750,13 @@ xs `Mu (Id i)` y (Garbage ys zs):
     xs i' `RevSplit` [y . ys] zs.
 
 xs `Mu (Sub g fs)` z (Garbage xs h hs):
-    fs `Map (~Apply xs)` fxhs.
-    [fs ys hs] `Zip` fxhs.
     ys `Mu g` z h.
-
-    f `~Apply xs` [f x h]:
+    `~Go fs xs` ys hs.
+    `~Go [] xs` [] []:
+    `~Go [f . fs] xs` [y . ys] [h . hs]:
         `Dup xs` xs'.
-        xs' `Mu f` x h.
+        xs' `Mu f` y h.
+        `~~Go fs xs` ys hs.
 
 [n . xs] `Mu (Rec f g)` y (Garbage n' xs hs):
     `Dup xs` xs'.
