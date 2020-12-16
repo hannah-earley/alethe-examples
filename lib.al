@@ -239,6 +239,24 @@ a b `Pair` n:
       ~Go (S (S n)) a = ~Go (S n) (S (S a')):
           a `* (S (S n))` (S (S a')).
 
+-- This demonstrates a way to simulate loops with recursion;
+-- The idea is to first compute the number of iterations whilst
+-- recursing down, as a 'depth parameter' (d). Finally the base
+-- case returns the initial loop values and the loop count. Each
+-- time we accept these values from a subcall, we then decrement
+-- the loop counter and perform whatever the next iteration step.
+--
+-- (motivation: fixing HG Baker's psiLisp factorial implementation
+--  citation: NREVERSAL of Fortune--The Thermodynamics of Garbage
+--            Collection, HG Baker, 1992)
+(S n) `FacRec` m:
+    (S n) 1 `~Go` m 1.
+
+    1 d `~Go` 1 d;
+    (S (S m)) d `~Go` (S (S n')) d':
+        (S m) (S d) `~~Go` n (S d').
+        n `* (S d')` (S (S n')).
+
 a b `LucasSucc` b a+b:
     a `+ b` a+b.
 
