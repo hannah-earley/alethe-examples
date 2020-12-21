@@ -234,6 +234,11 @@ a b `Pair` n:
         `> n' a+b` p.
     a `+ b` a+b.
 
+a b `Pair'` n:
+  ! ~Go n Z Z = ~Go Z a b.
+    ~Go (S n) Z b = ~Go n (S b) Z;
+    ~Go (S n) (S a) b = ~Go n a (S b);
+
 (S n) `Fac` m:
     ! ~Go (S n)     1 = ~Go 1     m.
       ~Go (S (S n)) a = ~Go (S n) (S (S a')):
